@@ -1,17 +1,15 @@
-const network = require('network');
 const routerApiFactory = require('./api/router')
 const cacher = require('./proxies/caching-proxy')
+const network = require('network');
 require('dotenv').config()
 
-
 getGatewayIP = () => {
-    const result = new Promise((resolve, reject) => {
-        network.get_gateway_ip((err, ip) => {
-            err ? reject(err) : resolve(ip)
+    return new Promise((resolve, reject) => {
+        network.get_interfaces_list(function (err, list) {
+            const ethernet = list.find(item => item.name == 'Ethernet')
+            err ? reject(err) : resolve(ethernet.gateway_ip)
         })
     });
-
-    return result
 }
 
 init = () => {

@@ -1,18 +1,25 @@
 module.exports = {
-    create : (obj, expiry) => {
+    create: (obj, expiry) => {
         let handler = {
-            Cache : [],
-            get: function(target, prop, receiver) {
+            Cache: [],
+            get: function (target, prop, receiver) {
                 if (typeof target[prop] === 'function') {
-                    if(Cache[prop] && Cache[prop].TakenAt + expiry >= Date.now()){
-                        const originalFunction = target[propKey];
+                    if (!this.Cache[prop] || this.Cache[prop].TakenAt + expiry >= Date.now()) {
+                        const originalFunction = target[prop];
                         return (...args) => {
-                            let result = originalFunction.apply(this, args);
-                            Cache[prop] = {TakenAt: Date.now(), Data: result};
+                            let result = originalFunction.apply(null, args).then((result) => {
+                                this.Cache[prop] = {
+                                    TakenAt: Date.now(),
+                                    Data: result
+                                };
+                            })
+                            return result;
                         }
                     } else {
                         return (...args) => {
-                            return Cache[prop].Data
+                            return Promise.resolve(() => {
+                                this.Cache[prop].Data
+                            })
                         }
                     }
                 }
