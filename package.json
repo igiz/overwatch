@@ -1,0 +1,16 @@
+{
+  "name": "overwatch",
+  "version": "1.0.0",
+  "description": "NodeJS app for controlling internet access for computers on a Virgin Media router.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ziggy",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "dotenv": "^8.2.0",
+    "network": "^0.4.1"
+  }
+}
