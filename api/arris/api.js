@@ -8,6 +8,7 @@ class RouterAPI {
     constructor(config) {
         this.config = config
         this.headers = {}
+        this.nonce = `_n=${(""+Math.random()).substr(2,5)}`
 
         this.api = axios.create({
             baseURL: `http://${config.url}`,
@@ -18,8 +19,7 @@ class RouterAPI {
         })
     }
 
-    login = async () => {
-        this.nonce = `_n=${(""+Math.random()).substr(2,5)}`
+    async login() {
         const credentials = Buffer.from(`${this.config.username}:${this.config.password}`, 'ascii').toString('base64')
         const timestamp = `_=${Date.now()}`
         const url = `login?arg=${credentials}&${this.nonce}&${timestamp}`
@@ -28,7 +28,7 @@ class RouterAPI {
         return result.data
     }
 
-    connectedDevices = async () => {
+    async connectedDevices() {
         const timestamp = `_=${Date.now()}`
         const url = `getConnDevices?${this.nonce}&${timestamp}`
         const result = await this.get(url)
@@ -36,7 +36,7 @@ class RouterAPI {
         return devices
     }
 
-    get = async (url) => {
+    async get (url) {
         let response = await this.api.get(url, {
             headers: this.headers
         })

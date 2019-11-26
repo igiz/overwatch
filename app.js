@@ -1,13 +1,14 @@
 const routerApiFactory = require('./api/router')
 const cacher = require('./proxies/caching-proxy')
+const reauthenticator = require('./proxies/re-authenticator')
 const network = require('network');
 require('dotenv').config()
 
 getGatewayIP = () => {
     return new Promise((resolve, reject) => {
         network.get_interfaces_list(function (err, list) {
-            const ethernet = list.find(item => item.name == 'Ethernet')
-            err ? reject(err) : resolve(ethernet.gateway_ip)
+            const interface = list.find(item => item.name == process.env.INTERFACE)
+            err ? reject(err) : resolve(interface.gateway_ip)
         })
     });
 }
@@ -20,7 +21,8 @@ init = () => {
             username: process.env.USER,
             password: process.env.PASSWORD
         })
-        const proxy = cacher.create(router, process.env.CACHE_INTERVAL)
+        let proxy = cacher.create(router, process.env.CACHE_INTERVAL)
+        proxy = reauthenticator.create(proxy, 'login', 5000)
         return proxy
     })
 }

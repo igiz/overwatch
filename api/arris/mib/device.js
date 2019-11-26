@@ -13,7 +13,7 @@ class Device {
         this.device_name = "None"
     }
 
-    toString = () => {
+    toString() {
         return `ip: ${this.ip}, hostname: ${this.hostname}`
     }
 
