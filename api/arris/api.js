@@ -24,7 +24,20 @@ class RouterAPI {
         const timestamp = `_=${Date.now()}`
         const url = `login?arg=${credentials}&${this.nonce}&${timestamp}`
         const result = await this.get(url)
-        this.headers.Cookie = 'credential=' + result.data
+
+
+        if (result.data) {
+            this.headers.Cookie = 'credential=' + result.data
+        } else {
+            // Arris router API doesn't seem to send any response back if password is incorrect - just get an empty 200 response. 
+            // So I will assume empty OK response is failed login
+            throw {
+                response: {
+                    status: 401
+                }
+            }
+        }
+
         return result.data
     }
 
@@ -36,7 +49,7 @@ class RouterAPI {
         return devices
     }
 
-    async get (url) {
+    async get(url) {
         let response = await this.api.get(url, {
             headers: this.headers
         })

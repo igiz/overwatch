@@ -7,13 +7,17 @@ module.exports = {
                     if (!this.Cache[prop] || this.Cache[prop].TakenAt + expiry >= Date.now()) {
                         const originalFunction = target[prop];
                         return (...args) => {
-                            originalFunction.apply(target, args).then((result) => {
-                                this.Cache[prop] = {
-                                    TakenAt: Date.now(),
-                                    Data: result
-                                };
+                            return new Promise((resolve, reject) => {
+                                originalFunction.apply(target, args).then((result) => {
+                                    this.Cache[prop] = {
+                                        TakenAt: Date.now(),
+                                        Data: result
+                                    }
+                                    resolve(result)
+                                }).catch((error) => {
+                                    reject(error)
+                                })
                             })
-                            return Promise.resolve(this.Cache[prop].Data);
                         }
                     } else {
                         return (...args) => {
