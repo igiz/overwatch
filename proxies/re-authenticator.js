@@ -1,16 +1,18 @@
 // This is a recursive authenticator
 const authenticator = {
-    authenticate: function (authFunction, target, retry, retryCount) {
+    authenticate: function (authFunction, target, retry, retryCount, waitFor) {
         return new Promise((resolve, reject) => {
+            console.log('Authenticating')
             authFunction.apply(target)
                 .then((result) => {
                     resolve(result)
                 }).catch((error) => {
                     if (this.unauthorized(error)) {
-                        if (retry > retryCount) {
+                        if (retry >= retryCount) {
                             reject('Exceeded re-authentication retry limit')
                         } else {
-                            resolve(this.authenticate(authFunction, target, ++retry, retryCount))
+                            console.log('Waiting to retry the connection')
+                            setTimeout(() => { resolve(this.authenticate(authFunction, target, ++retry, retryCount, waitFor)) }, waitFor)
                         }
                     } else {
                         reject(error)
@@ -24,7 +26,7 @@ const authenticator = {
 }
 
 module.exports = {
-    create: (obj, authfunc, retryCount) => {
+    create: (obj, authfunc, retryCount, waitFor) => {
         let handler = {
             Token: '',
             get: function (target, prop, receiver) {
@@ -37,7 +39,7 @@ module.exports = {
                                 resolve(result)
                             }).catch((error) => {
                                 if (authenticator.unauthorized(error)) {
-                                    authenticator.authenticate(authFunction, target, 0, retryCount)
+                                    authenticator.authenticate(authFunction, target, 0, retryCount, waitFor)
                                         .then(() => {
                                             resolve(functionToCall.apply(target, args))
                                         })

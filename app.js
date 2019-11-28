@@ -26,7 +26,7 @@ init = () => {
         })
         // Re-authenticating proxy on-top of caching proxy , because why not :))
         let proxy = cacher.create(router, process.env.CACHE_INTERVAL)
-        proxy = reauthenticator.create(proxy, 'login', process.env.AUTH_RETRY)
+        proxy = reauthenticator.create(proxy, 'login', process.env.AUTH_RETRY_COUNT, process.env.AUTH_WAIT_BEFORE_RETRY)
         return proxy
     })
 }
