@@ -42,14 +42,18 @@ start = () => {
             device.online ? online.push(device) : offline.push(device)
         })
 
+        log('\n')
+
         log(chalk.green("Online Devices:"))
         online.forEach(device => {
-            log(chalk `IP: {yellow ${device.ip}}\tHOSTNAME: {green ${device.hostname}}`);
+            log(chalk `IP: {yellow ${device.ip}}\tHOSTNAME: {bgGreen ${device.hostname}}\tMAC:{cyanBright  ${device.mac}}`)
         });
+
+        log('\n')
 
         log(chalk.red("Offline Devices:"))
         offline.forEach(device => {
-            log(chalk `IP: {yellow ${device.ip}}\tHOSTNAME: {red ${device.hostname}}`);
+            log(chalk `IP: {yellow ${device.ip}}\tHOSTNAME: {bgRed ${device.hostname}}\tMAC:{cyanBright  ${device.mac}}`)
         });
 
     }).catch((error) => {

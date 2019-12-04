@@ -47,7 +47,7 @@ convert = (data) => {
     for (let key in data) {
         const value = data[key]
 
-        if (key == "1" && value == "Finish"){
+        if (key == "1" && value == "Finish") {
             continue
         }
 
@@ -55,19 +55,19 @@ convert = (data) => {
         const oid = split_key.slice(0, 16).join('.')
         const ip = split_key.slice(19).join('.')
 
-        if (!current || current.ip != ip){
+        if (!current || current.ip != ip) {
             current = new Device(ip)
             devices.push(current)
         }
 
-        if (oid == HOST_NAME_OID){
+        if (oid == HOST_NAME_OID) {
             current.hostname = value
         } else if (oid == MAC_OID) {
             //Need to format
-            current.mac = value
+            current.mac = formatMac(value)
         } else if (oid == ADAPTER_TYPE_OID) {
             current.adapter_type = ADAPTER_TYPES[value]
-        } else if (oid == TYPE_OID) { 
+        } else if (oid == TYPE_OID) {
             current.type = value
         } else if (oid == LEASE_END_OID) {
             // Need to format
@@ -86,6 +86,19 @@ convert = (data) => {
 
     }
     return devices
+}
+
+formatMac = (mac) => {
+    const regex = /^\$[0-9A-Fa-f]{12}$/g
+    const address = mac.match(regex)
+    let result = 'NONE'
+    if (address) {
+        result = mac.substring(1)
+            .match(/.{2}/g)
+            .join(':')
+            .toUpperCase()
+    }
+    return result
 }
 
 module.exports = {
